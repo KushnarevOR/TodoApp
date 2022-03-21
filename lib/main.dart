@@ -37,6 +37,7 @@ class MainScreenState extends State<MainScreen> {
     );
 
     setState(() {
+
       list.addTodo(result, null);
     });
   }
