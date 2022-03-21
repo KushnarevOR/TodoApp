@@ -5,6 +5,16 @@ class TodoList {
     var todo = Todo(text: text, time: time);
     list.add(todo);
   }
+
+  TodoList() {
+    list.add(Todo(text: "First"));
+    list.add(Todo(text: "Second"));
+    list.add(Todo(text: "Third"));
+  }
+
+  int count() {
+    return list.length;
+  }
 }
 
 class Todo {
