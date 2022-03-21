@@ -48,19 +48,20 @@ class MainScreenState extends State<MainScreen> {
       appBar: AppBar(title: Text("Mein Todo List")),
       body: SizedBox(
         // height: 100,
-        child: ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: list.count(),
-            itemBuilder: (BuildContext context, int index) {
-              return Text(list.list[index].text, style: TextStyle(fontSize: 18));
-            }
+        child: ListView.separated(
+          padding: const EdgeInsets.all(8),
+          itemCount: list.count(),
+          itemBuilder: (BuildContext context, int index) {
+            return Text(list.list[index].text, style: TextStyle(fontSize: 18));
+          },
+          separatorBuilder: (BuildContext context, int index) => Divider(),
         ),
       ),
       persistentFooterButtons: [
         FloatingActionButton(
-          onPressed: addTodo,
-          tooltip: 'Add new note',
-          child: const Icon(Icons.add)
+            onPressed: addTodo,
+            tooltip: 'Add new note',
+            child: const Icon(Icons.add)
         )
       ],
     );
