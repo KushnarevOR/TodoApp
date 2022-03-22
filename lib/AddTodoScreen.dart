@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 
 class AddTodoScreen extends StatelessWidget{
-  TextEditingController todoController = TextEditingController();
+  TextEditingController textController = TextEditingController();
+  TextEditingController datetimeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class AddTodoScreen extends StatelessWidget{
           Padding(
             padding: EdgeInsets.all(15),
             child: TextField(
-              controller: todoController,
+              controller: textController,
               minLines: 3,
               maxLines: 5,
               decoration: InputDecoration(
@@ -28,6 +29,7 @@ class AddTodoScreen extends StatelessWidget{
           Padding(
             padding: EdgeInsets.all(15),
             child: DateTimePicker(
+              controller: datetimeController,
               type: DateTimePickerType.dateTime,
               dateMask: 'd MMM, yyyy - HH:mm',
               use24HourFormat: true,
@@ -40,11 +42,14 @@ class AddTodoScreen extends StatelessWidget{
             ),
           ),
           ValueListenableBuilder<TextEditingValue>(
-            valueListenable: todoController,
+            valueListenable: textController,
             builder: (context, value, child) {
               return FloatingActionButton(
                 onPressed: value.text.isNotEmpty ? () {
-                  Navigator.pop(context, todoController.text);
+                  Navigator.of(context).pop({
+                    "text": textController.text.trim(),
+                    "datetime": datetimeController.text.isNotEmpty ? datetimeController.text : null,
+                  });
                 } : null,
                 child: Text('ADD'),
               );

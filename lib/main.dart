@@ -37,8 +37,11 @@ class MainScreenState extends State<MainScreen> {
     );
 
     setState(() {
-
-      list.addTodo(result, null);
+      DateTime? dateTime = null;
+      if (result['datetime'] != null) {
+        dateTime = DateTime.parse(result['datetime']);
+      }
+      list.addTodo(result['text'], dateTime);
     });
   }
 
