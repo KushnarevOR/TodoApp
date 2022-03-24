@@ -55,7 +55,25 @@ class MainScreenState extends State<MainScreen> {
           padding: const EdgeInsets.all(8),
           itemCount: list.count(),
           itemBuilder: (BuildContext context, int index) {
-            return Text(list.list[index].text, style: TextStyle(fontSize: 18));
+            return Column(
+                children: [
+                  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(), style: TextStyle(fontSize: 12)),
+                      )
+                  ),
+                  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
+                      ),
+                  )
+                ]
+            );
+            // return Text(list.list[index].text, style: TextStyle(fontSize: 18));
           },
           separatorBuilder: (BuildContext context, int index) => Divider(),
         ),
