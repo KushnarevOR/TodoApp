@@ -45,37 +45,81 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
+  void changeTodo(int index) async{
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddTodoScreen(todo: list.list[index])),
+    );
+
+    setState(() {
+      list.list[index].text = result['text'];
+      DateTime? dateTime = null;
+      if (result['datetime'] != null) {
+        dateTime = DateTime.parse(result['datetime']);
+        list.list[index].time = dateTime;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Mein Todo List")),
       body: SizedBox(
         // height: 100,
-        child: ListView.separated(
+        child: ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: list.count(),
           itemBuilder: (BuildContext context, int index) {
-            return Column(
-                children: [
-                  Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(), style: TextStyle(fontSize: 12)),
-                      )
-                  ),
-                  Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
-                      ),
-                  )
-                ]
+            return Center(
+                child: InkWell(
+                    onTap: () {
+                      changeTodo(index);
+                    },
+                    child: Card(
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Padding(
+                                  padding: EdgeInsets.all(5),
+                                  child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(),
+                                        style: TextStyle(fontSize: 12)),
+                                  )
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
+                                ),
+                              )
+                            ]
+                        )
+                    )
+                )
             );
+            //   Column(
+            //     children: [
+            //       Padding(
+            //           padding: EdgeInsets.all(5),
+            //           child: Align(
+            //             alignment: Alignment.topLeft,
+            //             child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(), style: TextStyle(fontSize: 12)),
+            //           )
+            //       ),
+            //       Padding(
+            //           padding: EdgeInsets.all(5),
+            //           child: Align(
+            //             alignment: Alignment.centerLeft,
+            //             child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
+            //           ),
+            //       )
+            //     ]
+            // );
             // return Text(list.list[index].text, style: TextStyle(fontSize: 18));
           },
-          separatorBuilder: (BuildContext context, int index) => Divider(),
         ),
       ),
       persistentFooterButtons: [

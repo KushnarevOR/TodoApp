@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:lab1/TodoList.dart';
 
 class AddTodoScreen extends StatelessWidget{
   TextEditingController textController = TextEditingController();
   TextEditingController datetimeController = TextEditingController();
+
+  final Todo? todo;
+  AddTodoScreen({Key? key, this.todo}) : super(key: key) {
+    if (todo != null) {
+      textController.text = todo!.text;
+      if (todo!.time != null) {
+        datetimeController.text = todo!.time.toString();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +25,11 @@ class AddTodoScreen extends StatelessWidget{
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: TextField(
+
               controller: textController,
-              minLines: 3,
+              minLines: 2,
               maxLines: 5,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -27,7 +39,7 @@ class AddTodoScreen extends StatelessWidget{
             )
           ),
           Padding(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: DateTimePicker(
               controller: datetimeController,
               type: DateTimePickerType.dateTime,
