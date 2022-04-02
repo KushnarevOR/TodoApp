@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:lab1/AddTodoScreen.dart';
+import 'package:lab1/TodoDB.dart';
 import 'package:lab1/TodoList.dart';
 
 void main() {
@@ -28,7 +31,25 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
 
-  TodoList list = TodoList();
+  // TodoList list = TodoList();
+  var todoDB = TodoDB();
+  List<Todo> list = List.empty(growable: true);
+
+  @override
+  void initState() {
+    super.initState();
+    readTodoItemsList();
+  }
+
+  readTodoItemsList() async {
+    var items = await todoDB.getAllTodo();
+    items.forEach((item) {
+      setState(() {
+        var todo = Todo.fromMap(item);
+        list.add(todo);
+      });
+    });
+  }
 
   void addTodo() async{
     final result = await Navigator.push(
@@ -36,30 +57,35 @@ class MainScreenState extends State<MainScreen> {
       MaterialPageRoute(builder: (context) => AddTodoScreen()),
     );
 
+    DateTime? dateTime = null;
+    if (result['datetime'] != null) {
+      dateTime = DateTime.parse(result['datetime']);
+    }
+
+    var todo = Todo(text: result['text'], time: dateTime);
+    int? savedTodoId = await todoDB.insert(todo);
+    var addedTodo = await todoDB.getTodo(savedTodoId);
+
     setState(() {
-      DateTime? dateTime = null;
-      if (result['datetime'] != null) {
-        dateTime = DateTime.parse(result['datetime']);
-      }
-      list.addTodo(result['text'], dateTime);
+      list.add(addedTodo);
     });
   }
 
-  void changeTodo(int index) async{
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddTodoScreen(todo: list.list[index])),
-    );
-
-    setState(() {
-      list.list[index].text = result['text'];
-      DateTime? dateTime = null;
-      if (result['datetime'] != null) {
-        dateTime = DateTime.parse(result['datetime']);
-        list.list[index].time = dateTime;
-      }
-    });
-  }
+  // void changeTodo(int index) async{
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => AddTodoScreen(todo: list.list[index])),
+  //   );
+  //
+  //   setState(() {
+  //     list.list[index].text = result['text'];
+  //     DateTime? dateTime = null;
+  //     if (result['datetime'] != null) {
+  //       dateTime = DateTime.parse(result['datetime']);
+  //       list.list[index].time = dateTime;
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +95,12 @@ class MainScreenState extends State<MainScreen> {
         // height: 100,
         child: ListView.builder(
           padding: const EdgeInsets.all(8),
-          itemCount: list.count(),
+          itemCount: list.length, //list.count(),
           itemBuilder: (BuildContext context, int index) {
             return Center(
                 child: InkWell(
                     onTap: () {
-                      changeTodo(index);
+                      //changeTodo(index);
                     },
                     child: Card(
                         child: Column(
@@ -84,7 +110,7 @@ class MainScreenState extends State<MainScreen> {
                                   padding: EdgeInsets.all(5),
                                   child: Align(
                                     alignment: Alignment.topLeft,
-                                    child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(),
+                                    child: list[index].time == null ? Text("Time undefined") : Text(list[index].time.toString(),
                                         style: TextStyle(fontSize: 12)),
                                   )
                               ),
@@ -92,7 +118,7 @@ class MainScreenState extends State<MainScreen> {
                                 padding: EdgeInsets.all(10),
                                 child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
+                                    child: Text(list[index].text, style: TextStyle(fontSize: 18))
                                 ),
                               )
                             ]
@@ -100,25 +126,6 @@ class MainScreenState extends State<MainScreen> {
                     )
                 )
             );
-            //   Column(
-            //     children: [
-            //       Padding(
-            //           padding: EdgeInsets.all(5),
-            //           child: Align(
-            //             alignment: Alignment.topLeft,
-            //             child: list.list[index].time == null ? Text("Time undefined") : Text(list.list[index].time.toString(), style: TextStyle(fontSize: 12)),
-            //           )
-            //       ),
-            //       Padding(
-            //           padding: EdgeInsets.all(5),
-            //           child: Align(
-            //             alignment: Alignment.centerLeft,
-            //             child: Text(list.list[index].text, style: TextStyle(fontSize: 18))
-            //           ),
-            //       )
-            //     ]
-            // );
-            // return Text(list.list[index].text, style: TextStyle(fontSize: 18));
           },
         ),
       ),

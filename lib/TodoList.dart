@@ -18,9 +18,29 @@ class TodoList {
 }
 
 class Todo {
-  String text;
+  int? id;
+  String text = "";
   DateTime? time;
   bool isDone = false;
 
   Todo({required this.text, this.time});
+
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{
+      "text": text,
+      "datetime": time != null ? time.toString() : null,
+      "isDone": isDone == true ? 1 : 0,
+    };
+    if (id != null) {
+      map["id"] = id;
+    }
+    return map;
+  }
+
+  Todo.fromMap(Map<String, dynamic> map) {
+    this.id = map["id"];
+    this.text = map["text"];
+    this.time = map["datetime"] != null ? DateTime.parse(map["datetime"]) : null;
+    this.isDone = map["isDone"] == 1;
+  }
 }
