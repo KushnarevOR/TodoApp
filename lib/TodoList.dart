@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class TodoList {
   List<Todo> list = List.empty(growable: true);
 
@@ -45,12 +47,10 @@ class Todo {
   }
 
   String status() {
-    if (!this.isDone) {
-      return 'not done';
-    }
-    else {
-      return 'done';
-    }
+    return !this.isDone ? 'not done' : 'done';
   }
 
+  String getPrettyDate() {
+    return DateFormat('yyyy:mm:dd kk:mm').format(this.time!);
+  }
 }

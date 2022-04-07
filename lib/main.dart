@@ -166,7 +166,7 @@ class MainScreenState extends State<MainScreen> {
                               child: Align(
                                 alignment: Alignment.topLeft,
                                 child: list[index].time == null ? Text("Time undefined / " + list[index].status(), style: TextStyle(fontSize: 12)) :
-                                  Text(list[index].time.toString() + " / " + list[index].status(), style: TextStyle(fontSize: 12)),
+                                  Text(list[index].getPrettyDate() + " / " + list[index].status(), style: TextStyle(fontSize: 12)),
                               )
                           ),
                           Padding(
