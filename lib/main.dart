@@ -129,6 +129,13 @@ class MainScreenState extends State<MainScreen> {
     await todoDB.update(list[index]);
   }
 
+  void changeStatus(int index) async{
+    setState(() {
+      list[index].isDone = !list[index].isDone;
+    });
+    await todoDB.update(list[index]);
+  }
+
   void deleteTodo(int index) async{
     int id = (list[index].id)!.toInt();
     await flutterLocalNotificationsPlugin.cancel(id);
@@ -138,7 +145,7 @@ class MainScreenState extends State<MainScreen> {
       readTodoItemsList();
     });
   }
-
+  bool _lights = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,8 +165,8 @@ class MainScreenState extends State<MainScreen> {
                               padding: EdgeInsets.all(5),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: list[index].time == null ? Text("Time undefined") : Text(list[index].time.toString(),
-                                    style: TextStyle(fontSize: 12)),
+                                child: list[index].time == null ? Text("Time undefined / " + list[index].status(), style: TextStyle(fontSize: 12)) :
+                                  Text(list[index].time.toString() + " / " + list[index].status(), style: TextStyle(fontSize: 12)),
                               )
                           ),
                           Padding(
@@ -170,21 +177,33 @@ class MainScreenState extends State<MainScreen> {
                             ),
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               TextButton(
-                                child: const Text('Update'),
+                                child: const Text('status'),
                                 onPressed: () {
-                                  changeTodo(index);
-                                }
-                              ),
-                              TextButton(
-                                child: const Text('Delete'),
-                                onPressed: () {
-                                  deleteTodo(index);
+                                  changeStatus(index);
                                 },
-                              )
-                            ],
+                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                TextButton(
+                                  child: const Text('Update'),
+                                  onPressed: () {
+                                    changeTodo(index);
+                                  }
+                                ),
+                                TextButton(
+                                  child: const Text('Delete'),
+                                  onPressed: () {
+                                    deleteTodo(index);
+                                  },
+                                )
+                              ],
+                            )
+                ]
                           )
                         ]
                     ),

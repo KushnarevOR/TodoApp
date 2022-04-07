@@ -43,4 +43,14 @@ class Todo {
     this.time = map["datetime"] != null ? DateTime.parse(map["datetime"]) : null;
     this.isDone = map["isDone"] == 1;
   }
+
+  String status() {
+    if (!this.isDone) {
+      return 'not done';
+    }
+    else {
+      return 'done';
+    }
+  }
+
 }
