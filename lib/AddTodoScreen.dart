@@ -46,7 +46,7 @@ class AddTodoScreen extends StatelessWidget{
               dateMask: 'd MMM, yyyy - HH:mm',
               use24HourFormat: true,
               initialTime: TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1))),
-              firstDate: DateTime.now(),
+              firstDate: DateTime.parse('2020-07-20 20:18:04Z'),
               lastDate: DateTime(2100),
               icon: Icon(Icons.event),
               dateLabelText: 'Date/Time',

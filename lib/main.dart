@@ -5,9 +5,6 @@ import 'package:lab1/AddTodoScreen.dart';
 import 'package:lab1/TodoDB.dart';
 import 'package:lab1/TodoList.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -23,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter lab',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.indigo,
         ),
       home: MainScreen()
     );
@@ -45,10 +42,10 @@ class MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     readTodoItemsList();
-    tz.initializeTimeZones();
   }
 
   readTodoItemsList() async {
+    list.clear();
     var items = await todoDB.getAllTodo();
     items.forEach((item) {
       setState(() {
@@ -59,11 +56,11 @@ class MainScreenState extends State<MainScreen> {
   }
 
   final sound = 'notification_sound.mp3';
-  void showNotification(int? id, String title, DateTime localtime) async {
+  void showNotification(int? id, String title, DateTime time) async {
     int notifyID = id == null ? 0 : id;
     var notificationDetails = const NotificationDetails(
         android: AndroidNotificationDetails(
-          'ToDoList id 2',
+          'ToDoList id',
           'ToDoList',
           channelDescription: 'ToDoList channel',
           channelShowBadge: true,
@@ -73,36 +70,16 @@ class MainScreenState extends State<MainScreen> {
           sound: RawResourceAndroidNotificationSound('notification_sound'),
           playSound: true,
         ));
-    // String body = DateFormat.yMMMd().format(localtime);
 
-    await flutterLocalNotificationsPlugin.schedule(
-        notifyID, 'Take it, boy!', title, localtime, notificationDetails,
-        androidAllowWhileIdle: true);
+    if (time.isAfter(DateTime.now())) {
+      await flutterLocalNotificationsPlugin.cancel(notifyID);
+      await flutterLocalNotificationsPlugin.schedule(
+          notifyID, 'Take it, boy!', title, time, notificationDetails,
+          androidAllowWhileIdle: true);
 
+      setState(() {});
+    }
   }
-
-  // Future<void> showNotification(int? id, String text, DateTime time) async {
-  //   id = id == null ? 0 : id;
-  //   final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
-  //   tz.setLocalLocation(tz.getLocation(currentTimeZone));
-  //
-  //   await flutterLocalNotificationsPlugin.zonedSchedule(
-  //     id,
-  //     'Take it, boy!',
-  //     text,
-  //     tz.TZDateTime.now(tz.local).add(Duration(seconds: 2)),
-  //     const NotificationDetails(
-  //       android: AndroidNotificationDetails(
-  //         'Mein channel id', 'Mein channel',
-  //         channelDescription: 'Mein channel description',
-  //         importance: Importance.max,
-  //         priority: Priority.high,
-  //         // icon: "notification_icon",
-  //       )
-  //     ),
-  //     androidAllowWhileIdle: true,
-  //     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
-  // }
 
   void addTodo() async{
     final result = await Navigator.push(
@@ -139,6 +116,8 @@ class MainScreenState extends State<MainScreen> {
     }
 
     if(dateTime != null) {
+      int id = (list[index].id)!.toInt();
+      flutterLocalNotificationsPlugin.cancel(id);
       showNotification(list[index].id, result['text'], dateTime);
     }
 
@@ -148,6 +127,16 @@ class MainScreenState extends State<MainScreen> {
     });
 
     await todoDB.update(list[index]);
+  }
+
+  void deleteTodo(int index) async{
+    int id = (list[index].id)!.toInt();
+    await flutterLocalNotificationsPlugin.cancel(id);
+    await todoDB.delete(id);
+
+    setState(() {
+      readTodoItemsList();
+    });
   }
 
   @override
@@ -161,32 +150,44 @@ class MainScreenState extends State<MainScreen> {
           itemCount: list.length, //list.count(),
           itemBuilder: (BuildContext context, int index) {
             return Center(
-                child: InkWell(
-                    onTap: () {
-                      changeTodo(index);
-                    },
-                    child: Card(
-                        child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Padding(
-                                  padding: EdgeInsets.all(5),
-                                  child: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: list[index].time == null ? Text("Time undefined") : Text(list[index].time.toString(),
-                                        style: TextStyle(fontSize: 12)),
-                                  )
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(list[index].text, style: TextStyle(fontSize: 18))
-                                ),
+                child: Card(
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: list[index].time == null ? Text("Time undefined") : Text(list[index].time.toString(),
+                                    style: TextStyle(fontSize: 12)),
                               )
-                            ]
-                        )
-                    )
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(list[index].text, style: TextStyle(fontSize: 18))
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              TextButton(
+                                child: const Text('Update'),
+                                onPressed: () {
+                                  changeTodo(index);
+                                }
+                              ),
+                              TextButton(
+                                child: const Text('Delete'),
+                                onPressed: () {
+                                  deleteTodo(index);
+                                },
+                              )
+                            ],
+                          )
+                        ]
+                    ),
                 )
             );
           },
