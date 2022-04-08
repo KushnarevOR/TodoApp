@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:lab1/AddTodoScreen.dart';
 import 'package:lab1/TodoDB.dart';
@@ -57,7 +55,7 @@ class MainScreenState extends State<MainScreen> {
 
   final sound = 'notification_sound.mp3';
   void showNotification(int? id, String title, DateTime time) async {
-    int notifyID = id == null ? 0 : id;
+    // int notifyID = id == null ? 0 : id;
     var notificationDetails = const NotificationDetails(
         android: AndroidNotificationDetails(
           'ToDoList id',
@@ -72,12 +70,14 @@ class MainScreenState extends State<MainScreen> {
         ));
 
     if (time.isAfter(DateTime.now())) {
-      await flutterLocalNotificationsPlugin.cancel(notifyID);
+      await flutterLocalNotificationsPlugin.cancel(id!);
       await flutterLocalNotificationsPlugin.schedule(
-          notifyID, 'Take it, boy!', title, time, notificationDetails,
+          id,
+          'Take it, boy!',
+          title,
+          time,
+          notificationDetails,
           androidAllowWhileIdle: true);
-
-      setState(() {});
     }
   }
 
@@ -137,7 +137,7 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void deleteTodo(int index) async{
-    int id = (list[index].id)!.toInt();
+    int id = list[index].id!;
     await flutterLocalNotificationsPlugin.cancel(id);
     await todoDB.delete(id);
 
@@ -145,7 +145,7 @@ class MainScreenState extends State<MainScreen> {
       readTodoItemsList();
     });
   }
-  bool _lights = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
